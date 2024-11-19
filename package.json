@@ -1,0 +1,62 @@
+{
+  "name": "TruthOracle",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore ."
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^3.1.2",
+    "@chakra-ui/system": "^2.6.2",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@starknet-io/get-starknet": "^4.0.3",
+    "@starknet-io/get-starknet-core": "^4.0.3",
+    "@starknet-io/types-js": "^0.7.7",
+    "@types/node": "22.8.4",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "framer-motion": "^11.11.17",
+    "get-starknet": "^3.3.3",
+    "lucide-react": "^0.454.0",
+    "material-react-toastify": "^10.0.5",
+    "next": "^15.0.2",
+    "next-themes": "^0.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-icons": "^5.3.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.33.5",
+    "starknet": "^6.17.0",
+    "swr": "^2.2.5",
+    "typescript": "^5.6.3",
+    "zustand": "^5.0.1"
+  },
+  "devDependencies": {
+    "encoding": "^0.1.13",
+    "eslint": "^9.14.0",
+    "eslint-config-next": "15.0.3",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3",
+    "simple-zustand-devtools": "^1.1.0"
+  },
+  "findUnusedExports": {
+    "include": [
+      "./src/**/*.ts",
+      "./src/**/*.tsx",
+      "./src/**/*.d.ts",
+      "src/**/*.svelte"
+    ],
+    "exclude": [
+      "./.next/**/*"
+    ]
+  }
+}
