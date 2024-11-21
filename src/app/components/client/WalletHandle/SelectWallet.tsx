@@ -1,5 +1,4 @@
 import { isWalletObject } from '@starknet-io/get-starknet-core';
-
 import { Image, StackSeparator, VStack, useDisclosure } from '@chakra-ui/react';
 import {
   DialogBody,
@@ -44,6 +43,7 @@ export async function scanObjectForWalletsCustom(
   console.log(validWallets);
   return validWallets;
 }
+
 const checkCompatibility = async (
   myWalletSWO: WALLET_API.StarknetWindowObject
 ) => {
@@ -65,14 +65,10 @@ export default function SelectWallet() {
   const { open, onOpen, onClose } = useDisclosure();
 
   const myWallet = useStoreWallet((state) => state.StarknetWalletObject);
-  const setMyWallet = useStoreWallet(
-    (state) => state.setMyStarknetWalletObject
-  );
+  const setMyWallet = useStoreWallet((state) => state.setMyStarknetWalletObject);
 
   const myWalletAccount = useStoreWallet((state) => state.myWalletAccount);
-  const setMyWalletAccount = useStoreWallet(
-    (state) => state.setMyWalletAccount
-  );
+  const setMyWalletAccount = useStoreWallet((state) => state.setMyWalletAccount);
   const myFrontendProviderIndex = useFrontendProvider(
     (state) => state.currentFrontendProviderIndex
   );
@@ -99,43 +95,64 @@ export default function SelectWallet() {
     selectedWallet: WALLET_API.StarknetWindowObject
   ) => {
     console.log('Trying to connect wallet=', selectedWallet);
-    setMyWallet(selectedWallet); // zustand
-    setMyWalletAccount(
-      new WalletAccount(myFrontendProviders[2], selectedWallet)
-    );
+
+
 
     const result = await wallet.requestAccounts(selectedWallet);
-    if (typeof result == 'string') {
-      console.log('This Wallet is not compatible.');
-      setSelectWalletUI(false);
-      return;
-    }
-    console.log('Current account addr =', result);
-    if (Array.isArray(result)) {
-      const addr = validateAndParseAddress(result[0]);
-      setAddressAccount(addr); // zustand
-    }
-    const isConnectedWallet: boolean = await wallet
-      .getPermissions(selectedWallet)
-      .then((res: any) =>
-        (res as WALLET_API.Permission[]).includes(
-          WALLET_API.Permission.ACCOUNTS
-        )
-      );
-    setConnected(isConnectedWallet); // zustand
-    if (isConnectedWallet) {
-      const chainId = (await wallet.requestChainId(selectedWallet)) as string;
-      setChain(chainId);
-      setCurrentFrontendProviderIndex(
-        chainId === SNconstants.StarknetChainId.SN_MAIN ? 0 : 2
-      );
+    // Check current network (Mainnet or Sepolia)
+    const chainId = await wallet.requestChainId(selectedWallet);
+    console.log('Current Chain ID:', chainId);
 
-      console.log('change Provider index to :', myFrontendProviderIndex);
-    }
-    // ********** TODO : replace supportedSpecs by api versions when available in SNJS
-    setWalletApi(await wallet.supportedSpecs(selectedWallet));
+    if (chainId === SNconstants.StarknetChainId.SN_MAIN) {
+      // If the wallet is on the Mainnet, use alert() to notify the user
+      alert("Please switch your network to Sepolia.");
+      // setChain(chainId);
+      // setCurrentFrontendProviderIndex(2);  // Assuming Sepolia is at index 2
+    } else {
+      //   // Set the connection status based on wallet permissions
+      //   setMyWallet(selectedWallet); // zustand
+      //   setMyWalletAccount(
+      //     new WalletAccount(myFrontendProviders[2], selectedWallet)
+      //   );
 
-    setSelectWalletUI(false);
+      //   if (typeof result == 'string') {
+      //     console.log('This Wallet is not compatible.');
+      //     setSelectWalletUI(false);
+      //     return;
+      //   }
+      //   console.log('Current account addr =', result);
+      //   if (Array.isArray(result)) {
+      //     const addr = validateAndParseAddress(result[0]);
+      //     setAddressAccount(addr); // zustand
+      //   }
+
+      //   const isConnectedWallet: boolean = await wallet
+      //     .getPermissions(selectedWallet)
+      //     .then((res: any) =>
+      //       (res as WALLET_API.Permission[]).includes(
+      //         WALLET_API.Permission.ACCOUNTS
+      //       )
+      //     );
+      //   setConnected(isConnectedWallet); // zustand
+
+      //   setChain(chainId);
+      //   setCurrentFrontendProviderIndex(chainId === SNconstants.StarknetChainId.SN_MAIN ? 0 : 2);
+    }
+
+    // // Set the connection status based on wallet permissions
+    // const isConnectedWallet: boolean = await wallet
+    //   .getPermissions(selectedWallet)
+    //   .then((res: any) =>
+    //     (res as WALLET_API.Permission[]).includes(
+    //       WALLET_API.Permission.ACCOUNTS
+    //     )
+    //   );
+    // setConnected(isConnectedWallet); // zustand
+
+    // // Set supported specs (optional for your needs)
+    // setWalletApi(await wallet.supportedSpecs(selectedWallet));
+
+    // setSelectWalletUI(false);
   };
 
   useEffect(() => {
@@ -186,46 +203,21 @@ export default function SelectWallet() {
                   ? wallet.wallet.icon
                   : wallet.wallet.icon.light;
               return (
-                <>
-                  {wallet.isValid ? (
-                    <>
-                      <Button
-                        id={'wId' + index.toString()}
-                        // backgroundColor="gray.100"
-                        // color={"black"}
-                        variant='surface'
-                        fontSize='lg'
-                        fontWeight='bold'
-                        onClick={() => {
-                          setMyWallet(wallet.wallet); // zustand
-                          setSelectWalletUI(false);
-                          handleSelectedWallet(wallet.wallet);
-                          onClose();
-                        }}
-                      >
-                        <Image src={iconW} width={30} />
-                        {wallet.wallet.name + ' ' + wallet.wallet.version}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        id={'wId' + index.toString()}
-                        fontSize='lg'
-                        fontWeight='bold'
-                        variant='surface'
-                        backgroundColor='orange'
-                        disabled={true}
-                      >
-                        <Image src={iconW} width={30} />
-                        {wallet.wallet.name +
-                          ' ' +
-                          wallet.wallet.version +
-                          ' not compatible!'}
-                      </Button>
-                    </>
-                  )}
-                </>
+                <Button
+                  key={index}
+                  variant='surface'
+                  fontSize='lg'
+                  fontWeight='bold'
+                  onClick={() => {
+                    setMyWallet(wallet.wallet);
+                    setSelectWalletUI(false);
+                    handleSelectedWallet(wallet.wallet);
+                    onClose();
+                  }}
+                >
+                  <Image src={iconW} width={30} />
+                  {wallet.wallet.name + ' ' + wallet.wallet.version}
+                </Button>
               );
             })}
           </VStack>
